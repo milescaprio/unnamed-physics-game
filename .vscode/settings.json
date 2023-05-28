@@ -1,0 +1,7 @@
+{
+    "editor.wordWrap": "off",
+    "files.exclude": {
+        "*.class": true
+    },
+    "explorer.excludeGitIgnore": true
+}

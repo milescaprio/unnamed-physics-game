@@ -1,9 +1,11 @@
+project/compile_index
+project/compiled_index
+
 # Compiled class file
 *.class
 
 # Log file
-*.log
-
+#*.log
 # BlueJ files
 *.ctxt
 

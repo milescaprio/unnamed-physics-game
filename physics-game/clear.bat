@@ -1,0 +1,1 @@
+for /f %i in compiled_index do del %i
