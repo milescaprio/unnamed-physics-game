@@ -1,4 +1,4 @@
 package Resources;
 public class Debug {
-    public static final boolean drawing = true;
+    public static final boolean drawing = false;
 }

@@ -29,78 +29,92 @@ public class Camera {
         this.y1 = y1;
         this.x2 = x2;
         this.y2 = y2;
-        this.width = w;
-        this.height = h;
+        width = w;
+        height = h;
     }
 
     public Camera(double unitsPerPixel, int w, int h) {
-        this.x1 = - w * unitsPerPixel / 2;
-        this.y1 = - h * unitsPerPixel / 2;
-        this.x2 = w * unitsPerPixel / 2;
-        this.y2 = h * unitsPerPixel / 2;
-        this.width = w;
-        this.height = h;
+        x1 = - w * unitsPerPixel / 2;
+        y1 = - h * unitsPerPixel / 2;
+        x2 = w * unitsPerPixel / 2;
+        y2 = h * unitsPerPixel / 2;
+        width = w;
+        height = h;
     }
 
     public void zoomCenter(double coeff) {
         coeff = 1 / coeff;
-        double x = (this.x1 + this.x2) / 2;
-        double y = (this.y1 + this.y2) / 2;
-        this.x1 = x - (x - this.x1) * coeff;
-        this.y1 = y - (y - this.y1) * coeff;
-        this.x2 = x - (x - this.x2) * coeff;
-        this.y2 = y - (y - this.y2) * coeff;
+        double x = (x1 + x2) / 2;
+        double y = (y1 + y2) / 2;
+        x1 = x - (x - x1) * coeff;
+        y1 = y - (y - y1) * coeff;
+        x2 = x - (x - x2) * coeff;
+        y2 = y - (y - y2) * coeff;
     }
     
     public void pan(double dx, double dy) {
-        this.x1 += dx;
-        this.x2 += dx;
-        this.y1 += dy;
-        this.y2 += dy;
+        x1 += dx;
+        x2 += dx;
+        y1 += dy;
+        y2 += dy;
     }
 
     public Pixel map(Point p) {
-        int x = (int) ((p.x - this.x1) / (this.x2 - this.x1) * this.width);
-        int y = (int) ((p.y - this.y1) / (this.y2 - this.y1) * this.height);
+        int x = (int) ((p.x - x1) / (x2 - x1) * width);
+        int y = (int) ((p.y - y1) / (y2 - y1) * height);
         return new Pixel(x, y);
     }
 
     public Point reverseMap(Pixel p) {
-        double x = (double) p.x / this.width * (this.x2 - this.x1) + this.x1;
-        double y = (double) p.y / this.height * (this.y2 - this.y1) + this.y1;
+        double x = (double) p.x / width * (x2 - x1) + x1;
+        double y = (double) p.y / height * (y2 - y1) + y1;
         return new Point(x, y);
     }
 
     public int mapx(double x) {
-        return (int) ((x - this.x1) / (this.x2 - this.x1) * this.width);
+        return (int) ((x - x1) / (x2 - x1) * width);
     }
 
     public int mapy(double y) {
-        return (int) ((y - this.y1) / (this.y2 - this.y1) * this.height);
+        return (int) ((y - y1) / (y2 - y1) * height);
     }
 
     public double reverseMapx(int x) {
-        return (double) x / this.width * (this.x2 - this.x1) + this.x1;
+        return (double) x / width * (x2 - x1) + x1;
     }
 
     public double reverseMapy(int y) {
-        return (double) y / this.height * (this.y2 - this.y1) + this.y1;
+        return (double) y / height * (y2 - y1) + y1;
     }
 
     public int mapxscalar(double scalar) {
-        return (int) (scalar / (this.x2 - this.x1) * this.width);
+        return (int) (scalar / (x2 - x1) * width);
     }
 
     public int mapyscalar(double scalar) {
-        return (int) (scalar / (this.y2 - this.y1) * this.height);
+        return (int) (scalar / (y2 - y1) * height);
     }
 
     public double reverseMapxscalar(int scalar) {
-        return (double) scalar / this.width * (this.x2 - this.x1);
+        return (double) scalar / width * (x2 - x1);
     }
 
     public double reverseMapyscalar(int scalar) {
-        return (double) scalar / this.height * (this.y2 - this.y1);
+        return (double) scalar / height * (y2 - y1);
+    }
+
+    /**
+     * x coordinate per pixel value
+     */
+    public double xpp() {
+        return (x2 - x1) / width;
+    }
+
+    /**
+     * Y coordinate per pixel value
+     */
+    public double ypp() {
+        return (y2 - y1) / height;
     }
 
 }

@@ -7,8 +7,10 @@ public class GfxFigure implements GfxObject {
     public ArrayList<GfxShape> shapes;
     public double x;
     public double y;
-    public GfxFigure() {
+    public GfxFigure(double x, double y) {
         this.shapes = new ArrayList<GfxShape>();
+        this.x = x;
+        this.y = y;
     }
 
     public boolean isIntersecting(GfxFigure other) {
