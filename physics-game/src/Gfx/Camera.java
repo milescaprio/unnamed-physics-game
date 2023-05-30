@@ -1,4 +1,4 @@
-package GfxEngine;
+package gfx;
 
 public class Camera {
     public static class Point {
@@ -88,11 +88,11 @@ public class Camera {
     }
 
     public int mapxscalar(double scalar) {
-        return (int) (scalar / (x2 - x1) * width);
+        return (int) Math.ceil(scalar / (x2 - x1) * width);
     }
 
     public int mapyscalar(double scalar) {
-        return (int) (scalar / (y2 - y1) * height);
+        return (int) Math.ceil(scalar / (y2 - y1) * height);
     }
 
     public double reverseMapxscalar(int scalar) {

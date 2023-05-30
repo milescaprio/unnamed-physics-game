@@ -1,8 +1,8 @@
-package GfxEngine;
+package gfx;
 
 import java.awt.Graphics;
 
-import GfxEngine.Camera.Point;
+import gfx.Camera.Point;
 
 /**
  * A shape instance, to compose Figure's.

@@ -1,22 +1,24 @@
-import GfxEngine.Camera.Point;
 import Resources.Constants;
-import Snippets.KeyRunnable;
+import gfx.Snippets.KeyRunnable;
 import Snippets.UnitTest;
 
 import java.awt.event.KeyEvent;
 
-import GfxEngine.Camera;
-import GfxEngine.GfxEngine;
-import GfxEngine.GfxFigure;
-import GfxEngine.GfxEngine.GfxObjectHandle;
-import GfxEngine.RGB;
-import GfxEngine.SolidCircle;
-import GfxEngine.SolidRectangle;
+import Game.GameEngine;
+import Game.GameEngine.TickScheduleHandle;
+import gfx.Camera;
+import gfx.GfxEngine;
+import gfx.GfxFigure;
+import gfx.GfxObject;
+import gfx.RGB;
+import gfx.SolidCircle;
+import gfx.SolidRectangle;
+import gfx.Camera.Point;
+import gfx.GfxEngine.GfxObjectHandle;
 
 //
 // Hey guys this is the head of testing the program
 // Skim the code in this file and run it
-//
 //
 
 /**
@@ -64,6 +66,9 @@ public class Dev {
 
     //Draw Bally the Ball and Squarey the Square
     //WASD to pan and QE to zoom
+    /**
+     * 
+     */
     public static void GfxGraphicsTest() {
         //The x and y values are arbitrary, based on the camera size. Consider them "meters"
         SolidCircle ballybody = new SolidCircle(0, 0, 25, new RGB(0, 140, 255));
@@ -74,47 +79,112 @@ public class Dev {
         SolidCircle eyeball_pupl_rght = new SolidCircle( 10,0,3, new RGB(0  , 0  , 0  ));
 
 
-        var bally_fig = new GfxFigure(-30, 0);
+        GfxFigure bally_fig = new GfxFigure(-30, 0);
         bally_fig.shapes.add(ballybody);
         bally_fig.shapes.add(eyeball_edge_left);
         bally_fig.shapes.add(eyeball_pupl_left);
         bally_fig.shapes.add(eyeball_edge_rght);
         bally_fig.shapes.add(eyeball_pupl_rght);
 
-        var squarey_fig = new GfxFigure(30, 0);
+        GfxFigure squarey_fig = new GfxFigure(30, 0);
         squarey_fig.shapes.add(squareybody);
         squarey_fig.shapes.add(eyeball_edge_left);
         squarey_fig.shapes.add(eyeball_pupl_left);
         squarey_fig.shapes.add(eyeball_edge_rght);
         squarey_fig.shapes.add(eyeball_pupl_rght);
 
-        GfxEngine engine = new GfxEngine(new Camera(0.1, 1920, 1080));
-        GfxObjectHandle ballHandle = engine.add_gfx(bally_fig, "bally");
-        GfxObjectHandle squareHandle = engine.add_gfx(squarey_fig, "squarey");
-        engine.addKeyPressedEvent(new KeyRunnable() {
-            public void run(KeyEvent e) {
+        GameEngine engine = new GameEngine(new GfxEngine(new Camera(0.1, 1920, 1080), Constants.title));
+        GfxObjectHandle ballHandle = engine.gfxEngine.add_gfx(bally_fig, "bally");
+        GfxObjectHandle squareHandle = engine.gfxEngine.add_gfx(squarey_fig, "squarey");
+        var xAxisFigure = new GfxFigure(0,0);
+        var yAxisFigure = new GfxFigure(0,0);
+        xAxisFigure.shapes.add(new SolidRectangle(0, 0, 1000000, 0.1, new RGB(0,0,0)));
+        yAxisFigure.shapes.add(new SolidRectangle(0, 0, 0.1, 1000000, new RGB(0,0,0)));
+        GfxObjectHandle xAxisHandle = engine.gfxEngine.add_gfx(xAxisFigure, "x axis");
+        GfxObjectHandle yAxisHandle = engine.gfxEngine.add_gfx(yAxisFigure, "y axis");
+        engine.gfxEngine.addKeyEvent(new KeyRunnable() {
+            public TickScheduleHandle wid = null;
+            public TickScheduleHandle sid = null;
+            public TickScheduleHandle aid = null;
+            public TickScheduleHandle did = null;
+            public TickScheduleHandle eid = null;
+            public TickScheduleHandle qid = null;
+            public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_W) {
-                    engine.camera.pan(0, 25*engine.camera.xpp());
+                    if(wid != null) engine.removeSchedule(wid);
+                    wid = engine.addSchedule(1, new Runnable() {
+                        public void run() {
+                            engine.gfxEngine.camera.pan(0, 5*engine.gfxEngine.camera.ypp());
+                        }
+                    });
                 }
                 if (e.getKeyCode() == KeyEvent.VK_S) {
-                    engine.camera.pan(0, -25*engine.camera.xpp());
-                }
-                if (e.getKeyCode() == KeyEvent.VK_A) {
-                    engine.camera.pan(-25*engine.camera.ypp(), 0);
+                    if(sid != null) engine.removeSchedule(sid);
+                    sid = engine.addSchedule(1, new Runnable() {
+                        public void run() {
+                            engine.gfxEngine.camera.pan(0, -5*engine.gfxEngine.camera.ypp());
+                        }
+                    });
                 }
                 if (e.getKeyCode() == KeyEvent.VK_D) {
-                    engine.camera.pan(25*engine.camera.ypp(), 0);
+                    if(did != null) engine.removeSchedule(did);
+                    did = engine.addSchedule(1, new Runnable() {
+                        public void run() {
+                            engine.gfxEngine.camera.pan(5*engine.gfxEngine.camera.xpp(), 0);
+                        }
+                    });
+                }
+                if (e.getKeyCode() == KeyEvent.VK_A) {
+                    if(aid != null) engine.removeSchedule(aid);
+                    aid = engine.addSchedule(1, new Runnable() {
+                        public void run() {
+                            engine.gfxEngine.camera.pan(-5*engine.gfxEngine.camera.xpp(), 0);
+                        }
+                    });
                 }
                 if (e.getKeyCode() == KeyEvent.VK_Q) {
-                    engine.camera.zoomCenter(1.05);
+                    if(qid != null) engine.removeSchedule(qid);
+                    qid = engine.addSchedule(1, new Runnable() {
+                        public void run() {
+                            engine.gfxEngine.camera.zoomCenter(1.01);
+                        }
+                    });
                 }
                 if (e.getKeyCode() == KeyEvent.VK_E) {
-                    engine.camera.zoomCenter(1/1.05);
+                    if(eid != null) engine.removeSchedule(eid);
+                    eid = engine.addSchedule(1, new Runnable() {
+                        public void run() {
+                            engine.gfxEngine.camera.zoomCenter(1/1.01);
+                        }
+                    });
                 }
             }
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_W && wid != null) {
+                    engine.removeSchedule(wid);
+                }
+                if (e.getKeyCode() == KeyEvent.VK_S && sid != null) {
+                    engine.removeSchedule(sid);
+                }
+                if (e.getKeyCode() == KeyEvent.VK_A && aid != null) {
+                    engine.removeSchedule(aid);
+                }
+                if (e.getKeyCode() == KeyEvent.VK_D && did != null) {
+                    engine.removeSchedule(did);
+                }
+                if (e.getKeyCode() == KeyEvent.VK_E && eid != null) {
+                    engine.removeSchedule(eid);
+                }
+                if (e.getKeyCode() == KeyEvent.VK_Q && qid != null) {
+                    engine.removeSchedule(qid);
+                }
+            }
+            public void keyTyped(KeyEvent e) {
+                //
+            }
         });
-        engine.decoration(Constants.isDecorated);
-        engine.init();
-        engine.changeRefreshRate(60);
+        engine.gfxEngine.decoration(Constants.isDecorated);
+        engine.initAll();
+        engine.gfxEngine.changeRefreshRate(60);
     }
 }

@@ -1,6 +1,6 @@
 package Game;
 
-public class Game {
+public class BallyTheBall {
     public void run() {
         //Main game process
 

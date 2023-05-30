@@ -1,0 +1,24 @@
+User interfaces with GfxEngine to handle all graphics that need to be outputted.
+
+User
+|
+| window width, window height, GfxObjects through GfxObjectHandle
+|
+GfxEngine -> Screen
+
+GfxEngine provides camera information and graphics points to the objects to allow them to draw themselves.
+
+GfxEngine
+|
+| Camera\/
+| Graphics \/ -> Screen
+|
+GfxObject... [draw()]
+
+User builds up Traditional GfxFigure GfxObjects with shapes.
+
+User
+|
+| GfxShape's... [draw()]
+|
+[GfxEngine]'s GfxFigure (GfxObject)

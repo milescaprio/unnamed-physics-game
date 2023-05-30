@@ -1,4 +1,4 @@
-package GfxEngine;
+package gfx;
 
 import java.awt.Graphics;
 import java.util.ArrayList;

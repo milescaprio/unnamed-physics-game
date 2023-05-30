@@ -1,4 +1,4 @@
-package GfxEngine;
+package gfx;
 
 public class RGB {
     public int r;

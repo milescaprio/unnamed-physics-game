@@ -1,4 +1,4 @@
-package Snippets;
+package gfx.Snippets;
 
 import java.lang.Math;
 

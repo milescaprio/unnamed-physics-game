@@ -1,4 +1,4 @@
-package GfxEngine;
+package gfx;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
@@ -6,15 +6,14 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import gfx.Snippets.KeyRunnable;
+import gfx.Debug;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import Resources.Gfx;
-import Snippets.KeyRunnable;
-import Resources.Debug;
-import Resources.Constants;
 
 /**
  * A class that can drive 2D graphics for use for this project.
@@ -23,9 +22,7 @@ import Resources.Constants;
 public class GfxEngine {
     public Camera camera;
     private ArrayList<GfxElement> elements;
-    private ArrayList<KeyRunnable> keyPressed;
-    private ArrayList<KeyRunnable> keyReleased;
-    private ArrayList<KeyRunnable> keyTyped; 
+    private ArrayList<KeyRunnable> keyEvents;
     public JFrame frame;
     public GfxPanel panel;
     private Timer frameRefresh;
@@ -33,14 +30,12 @@ public class GfxEngine {
     /**
      * Creates new GfxEngine with empty JFrame and JPanel
      */
-    public GfxEngine(Camera camera) {
+    public GfxEngine(Camera camera, String frameTitle) {
         this.camera = camera;
         elements = new ArrayList<GfxElement>();
-        this.frame = new JFrame(Constants.title);
+        this.frame = new JFrame(frameTitle);
         this.panel = new GfxPanel();
-        this.keyPressed = new ArrayList<KeyRunnable>();
-        this.keyReleased = new ArrayList<KeyRunnable>();
-        this.keyTyped = new ArrayList<KeyRunnable>();
+        this.keyEvents = new ArrayList<KeyRunnable>();
         this.frameRefresh = new Timer();
     }
     
@@ -83,22 +78,22 @@ public class GfxEngine {
 
         @Override
         public void keyTyped(KeyEvent e) {
-            for (KeyRunnable runnable : keyTyped) {
-                runnable.run(e);
+            for (KeyRunnable runnable : keyEvents) {
+                runnable.keyTyped(e);
             }
         }
 
         @Override
         public void keyPressed(KeyEvent e) {
-            for (KeyRunnable runnable : keyPressed) {
-                runnable.run(e);
+            for (KeyRunnable runnable : keyEvents) {
+                runnable.keyPressed(e);
             }
         }
 
         @Override
         public void keyReleased(KeyEvent e) {
-            for (KeyRunnable runnable : keyReleased) {
-                runnable.run(e);
+            for (KeyRunnable runnable : keyEvents) {
+                runnable.keyReleased(e);
             }
         }
     }
@@ -121,31 +116,13 @@ public class GfxEngine {
         });
     }
 
-    public GfxKeyEventHandle addKeyTypedEvent(KeyRunnable runnable) {
-        this.keyTyped.add(runnable);
-        return new GfxKeyEventHandle(this.keyTyped.size() - 1);
+    public GfxKeyEventHandle addKeyEvent(KeyRunnable runnable) {
+        this.keyEvents.add(runnable);
+        return new GfxKeyEventHandle(this.keyEvents.size() - 1);
     }
 
-    public GfxKeyEventHandle addKeyPressedEvent(KeyRunnable runnable) {
-        this.keyPressed.add(runnable);
-        return new GfxKeyEventHandle(this.keyPressed.size() - 1);
-    }
-
-    public GfxKeyEventHandle addKeyReleasedEvent(KeyRunnable runnable) {
-        this.keyReleased.add(runnable);
-        return new GfxKeyEventHandle(this.keyReleased.size() - 1);
-    }
-
-    public void removeKeyTypedEvent(GfxKeyEventHandle handle) {
-        this.keyTyped.set(handle.id(), null);
-    }
-
-    public void removeKeyPressedEvent(GfxKeyEventHandle handle) {
-        this.keyPressed.set(handle.id(), null);
-    }
-
-    public void removeKeyReleasedEvent(GfxKeyEventHandle handle) {
-        this.keyReleased.set(handle.id(), null);
+    public void removeKeyEvent(GfxKeyEventHandle handle) {
+        this.keyEvents.set(handle.id(), null);
     }
 
     public void changeRefreshRate(double hz) {

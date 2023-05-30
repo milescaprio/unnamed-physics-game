@@ -1,7 +1,7 @@
-package GfxEngine;
+package gfx;
 
-import GfxEngine.Camera.Point;
-import Snippets.xMath;
+import gfx.Camera.Point;
+import gfx.Snippets.xMath;
 
 /**
  * Base class for circle shapes
