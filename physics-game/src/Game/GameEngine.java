@@ -1,10 +1,13 @@
 package Game;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import gfx.GfxEngine;
+import gfx.GfxEngine.KeyEventHandle;
+import gfx.Snippets.KeyRunnable;
 
 /**
  * A class which holds a GfxEngine Graphics Engine and a Game Tick timer, for this project.
@@ -41,6 +44,33 @@ public class GameEngine {
     public void removeSchedule(TickScheduleHandle handle) {
         events.set(handle.id(), null);
     }
+
+    public KeyEventHandle addKeyTickBind(int keyCode, Runnable task) {
+        KeyRunnable runnable = new KeyRunnable () {
+            public TickScheduleHandle handle = null;
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == keyCode) {
+                    if(handle != null) removeSchedule(handle);
+                    handle = addSchedule(1, task);
+                }
+            }
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == keyCode && handle != null) {
+                    removeSchedule(handle);
+                }
+            }
+            @Override
+            public void keyTyped(KeyEvent e) {
+                //
+            }
+        };
+        return gfxEngine.addKeyEvent(runnable);
+    }
+
+    public void removeKeyTickBind(KeyEventHandle handle) {
+        gfxEngine.removeKeyEvent(handle);
+    }
+
     private class TickSchedule {
         public int interval;
         public Runnable task;

@@ -5,11 +5,9 @@ import Snippets.UnitTest;
 import java.awt.event.KeyEvent;
 
 import Game.GameEngine;
-import Game.GameEngine.TickScheduleHandle;
 import gfx.Camera;
 import gfx.GfxEngine;
 import gfx.GfxFigure;
-import gfx.GfxObject;
 import gfx.RGB;
 import gfx.SolidCircle;
 import gfx.SolidRectangle;
@@ -99,90 +97,34 @@ public class Dev {
         var xAxisFigure = new GfxFigure(0,0);
         var yAxisFigure = new GfxFigure(0,0);
         xAxisFigure.shapes.add(new SolidRectangle(0, 0, 1000000, 0.1, new RGB(0,0,0)));
-        yAxisFigure.shapes.add(new SolidRectangle(0, 0, 0.1, 1000000, new RGB(0,0,0)));
+        yAxisFigure.shapes.add(new SolidRectangle(0, 0, 0.1, 100000, new RGB(0,0,0)));
         GfxObjectHandle xAxisHandle = engine.gfxEngine.add_gfx(xAxisFigure, "x axis");
         GfxObjectHandle yAxisHandle = engine.gfxEngine.add_gfx(yAxisFigure, "y axis");
-        engine.gfxEngine.addKeyEvent(new KeyRunnable() {
-            public TickScheduleHandle wid = null;
-            public TickScheduleHandle sid = null;
-            public TickScheduleHandle aid = null;
-            public TickScheduleHandle did = null;
-            public TickScheduleHandle eid = null;
-            public TickScheduleHandle qid = null;
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_W) {
-                    if(wid != null) engine.removeSchedule(wid);
-                    wid = engine.addSchedule(1, new Runnable() {
-                        public void run() {
-                            engine.gfxEngine.camera.pan(0, 5*engine.gfxEngine.camera.ypp());
-                        }
-                    });
-                }
-                if (e.getKeyCode() == KeyEvent.VK_S) {
-                    if(sid != null) engine.removeSchedule(sid);
-                    sid = engine.addSchedule(1, new Runnable() {
-                        public void run() {
-                            engine.gfxEngine.camera.pan(0, -5*engine.gfxEngine.camera.ypp());
-                        }
-                    });
-                }
-                if (e.getKeyCode() == KeyEvent.VK_D) {
-                    if(did != null) engine.removeSchedule(did);
-                    did = engine.addSchedule(1, new Runnable() {
-                        public void run() {
-                            engine.gfxEngine.camera.pan(5*engine.gfxEngine.camera.xpp(), 0);
-                        }
-                    });
-                }
-                if (e.getKeyCode() == KeyEvent.VK_A) {
-                    if(aid != null) engine.removeSchedule(aid);
-                    aid = engine.addSchedule(1, new Runnable() {
-                        public void run() {
-                            engine.gfxEngine.camera.pan(-5*engine.gfxEngine.camera.xpp(), 0);
-                        }
-                    });
-                }
-                if (e.getKeyCode() == KeyEvent.VK_Q) {
-                    if(qid != null) engine.removeSchedule(qid);
-                    qid = engine.addSchedule(1, new Runnable() {
-                        public void run() {
-                            engine.gfxEngine.camera.zoomCenter(1.01);
-                        }
-                    });
-                }
-                if (e.getKeyCode() == KeyEvent.VK_E) {
-                    if(eid != null) engine.removeSchedule(eid);
-                    eid = engine.addSchedule(1, new Runnable() {
-                        public void run() {
-                            engine.gfxEngine.camera.zoomCenter(1/1.01);
-                        }
-                    });
-                }
-            }
-            public void keyReleased(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_W && wid != null) {
-                    engine.removeSchedule(wid);
-                }
-                if (e.getKeyCode() == KeyEvent.VK_S && sid != null) {
-                    engine.removeSchedule(sid);
-                }
-                if (e.getKeyCode() == KeyEvent.VK_A && aid != null) {
-                    engine.removeSchedule(aid);
-                }
-                if (e.getKeyCode() == KeyEvent.VK_D && did != null) {
-                    engine.removeSchedule(did);
-                }
-                if (e.getKeyCode() == KeyEvent.VK_E && eid != null) {
-                    engine.removeSchedule(eid);
-                }
-                if (e.getKeyCode() == KeyEvent.VK_Q && qid != null) {
-                    engine.removeSchedule(qid);
-                }
-            }
-            public void keyTyped(KeyEvent e) {
-                //
-            }
-        });
+        engine.addKeyTickBind(KeyEvent.VK_W, new Runnable() {
+            public void run() {
+                engine.gfxEngine.camera.pan(0, 5*engine.gfxEngine.camera.ypp());
+        }});
+        engine.addKeyTickBind(KeyEvent.VK_S, new Runnable() {
+            public void run() {
+                engine.gfxEngine.camera.pan(0, -5*engine.gfxEngine.camera.ypp());
+        }});
+        engine.addKeyTickBind(KeyEvent.VK_D, new Runnable() {
+            public void run() {
+                engine.gfxEngine.camera.pan(5*engine.gfxEngine.camera.xpp(), 0);
+        }});
+        engine.addKeyTickBind(KeyEvent.VK_A, new Runnable() {
+            public void run() {
+                engine.gfxEngine.camera.pan(-5*engine.gfxEngine.camera.xpp(), 0);
+        }});
+        engine.addKeyTickBind(KeyEvent.VK_E, new Runnable() {
+            public void run() {
+                engine.gfxEngine.camera.zoomCenter(1/1.01);
+        }});
+        engine.addKeyTickBind(KeyEvent.VK_Q, new Runnable() {
+            public void run() {
+                engine.gfxEngine.camera.zoomCenter(1.01);
+        }});
+            
         engine.gfxEngine.decoration(Constants.isDecorated);
         engine.initAll();
         engine.gfxEngine.changeRefreshRate(60);

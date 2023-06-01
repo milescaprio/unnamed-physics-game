@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import Game.GameEngine.TickScheduleHandle;
 import Resources.Gfx;
 
 /**
@@ -116,12 +117,12 @@ public class GfxEngine {
         });
     }
 
-    public GfxKeyEventHandle addKeyEvent(KeyRunnable runnable) {
+    public KeyEventHandle addKeyEvent(KeyRunnable runnable) {
         this.keyEvents.add(runnable);
-        return new GfxKeyEventHandle(this.keyEvents.size() - 1);
+        return new KeyEventHandle(this.keyEvents.size() - 1);
     }
 
-    public void removeKeyEvent(GfxKeyEventHandle handle) {
+    public void removeKeyEvent(KeyEventHandle handle) {
         this.keyEvents.set(handle.id(), null);
     }
 
@@ -160,9 +161,9 @@ public class GfxEngine {
         }
     }
 
-    public class GfxKeyEventHandle {
+    public class KeyEventHandle {
         private int id;
-        public GfxKeyEventHandle(int id) {
+        public KeyEventHandle(int id) {
             this.id = id;
         }
         public int id() {
