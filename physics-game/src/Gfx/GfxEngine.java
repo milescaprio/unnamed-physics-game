@@ -27,6 +27,7 @@ public class GfxEngine {
     public JFrame frame;
     public GfxPanel panel;
     private Timer frameRefresh;
+    public CurrentScreen screenConfig;
 
     /**
      * Creates new GfxEngine with empty JFrame and JPanel
@@ -38,6 +39,7 @@ public class GfxEngine {
         this.panel = new GfxPanel();
         this.keyEvents = new ArrayList<KeyRunnable>();
         this.frameRefresh = new Timer();
+        this.screenConfig = new CurrentScreen();
     }
     
     /**
@@ -138,6 +140,21 @@ public class GfxEngine {
         });
     }
 
+    public void adaptRefreshRate() {
+        changeRefreshRate(screenConfig.refreshRate);
+    }
+
+    public void changeScreenSize(int width, int height) {
+        camera.width = width;
+        camera.height = height;
+        SwingUtilities.invokeLater(() -> {
+            frame.setSize(width, height);
+        });
+    }
+
+    public void fullscreen() {
+        changeScreenSize(screenConfig.width, screenConfig.height);
+    }
 
     private class GfxElement {
         public String name;

@@ -1,4 +1,4 @@
-@REM call clear
+call clear
 call reload
 call compile
 call rundev

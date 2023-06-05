@@ -12,8 +12,12 @@ public class SolidCircle extends CircleSkull {
         data[0] = radius;
         this.color = color;
     }
-    public void draw(Camera camera, Graphics graphics, double x, double y) {
-        graphics.setColor(new Color(color.r, color.g, color.b));
-        graphics.fillOval(camera.mapx(x+relX-data[0]), camera.mapy(y+relY-data[0]), 2 * camera.mapxscalar(data[0]), 2 * camera.mapyscalar(data[0]));
+    public void draw(Camera c, Graphics g, double x, double y) {
+        g.setColor(new Color(color.r, color.g, color.b));
+        //FillOval assumes the x y bottom left corner of the figure.
+        //Therefore, the radius must be subtracted after cast in case the negative mapped value increases the position.
+        int radxpx = c.mapxscalar(data[0]);
+        int radypx = c.mapyscalar(data[0]);
+        g.fillOval(c.mapx(x+relX) - radxpx, c.mapy(y+relY) - radypx, 2 * radxpx, 2 * radypx);
     }
 }

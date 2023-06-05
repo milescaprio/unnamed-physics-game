@@ -77,21 +77,28 @@ public class Dev {
         SolidCircle eyeball_pupl_rght = new SolidCircle( 10,0,3, new RGB(0  , 0  , 0  ));
 
 
-        GfxFigure bally_fig = new GfxFigure(-30, 0);
+        GfxFigure bally_fig = new GfxFigure(-30, 30);
         bally_fig.shapes.add(ballybody);
         bally_fig.shapes.add(eyeball_edge_left);
         bally_fig.shapes.add(eyeball_pupl_left);
         bally_fig.shapes.add(eyeball_edge_rght);
         bally_fig.shapes.add(eyeball_pupl_rght);
 
-        GfxFigure squarey_fig = new GfxFigure(30, 0);
+        GfxFigure squarey_fig = new GfxFigure(30, 30);
         squarey_fig.shapes.add(squareybody);
         squarey_fig.shapes.add(eyeball_edge_left);
         squarey_fig.shapes.add(eyeball_pupl_left);
         squarey_fig.shapes.add(eyeball_edge_rght);
         squarey_fig.shapes.add(eyeball_pupl_rght);
 
+        
         GameEngine engine = new GameEngine(new GfxEngine(new Camera(0.1, 1920, 1080), Constants.title));
+        // for (int i = 0; i < 360; i++) {
+        //     GfxFigure littlecircle = new GfxFigure(0, 0);
+        //     littlecircle.shapes.add(new SolidCircle(Math.cos(Math.toRadians(i)) * 100, Math.sin(Math.toRadians(i)) * i, 1, new RGB(255, 255, 255)));
+        //     engine.gfxEngine.add_gfx(littlecircle, "little circle " + i);
+        // }
+
         GfxObjectHandle ballHandle = engine.gfxEngine.add_gfx(bally_fig, "bally");
         GfxObjectHandle squareHandle = engine.gfxEngine.add_gfx(squarey_fig, "squarey");
         var xAxisFigure = new GfxFigure(0,0);
@@ -102,11 +109,11 @@ public class Dev {
         GfxObjectHandle yAxisHandle = engine.gfxEngine.add_gfx(yAxisFigure, "y axis");
         engine.addKeyTickBind(KeyEvent.VK_W, new Runnable() {
             public void run() {
-                engine.gfxEngine.camera.pan(0, 5*engine.gfxEngine.camera.ypp());
+                engine.gfxEngine.camera.pan(0, -5*engine.gfxEngine.camera.ypp()); //Up is negative pixels
         }});
         engine.addKeyTickBind(KeyEvent.VK_S, new Runnable() {
             public void run() {
-                engine.gfxEngine.camera.pan(0, -5*engine.gfxEngine.camera.ypp());
+                engine.gfxEngine.camera.pan(0, 5*engine.gfxEngine.camera.ypp());
         }});
         engine.addKeyTickBind(KeyEvent.VK_D, new Runnable() {
             public void run() {
@@ -127,6 +134,7 @@ public class Dev {
             
         engine.gfxEngine.decoration(Constants.isDecorated);
         engine.initAll();
-        engine.gfxEngine.changeRefreshRate(60);
+        engine.gfxEngine.fullscreen();
+        engine.gfxEngine.adaptRefreshRate();
     }
 }
