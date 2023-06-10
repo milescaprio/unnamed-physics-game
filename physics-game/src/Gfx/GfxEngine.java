@@ -7,13 +7,11 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import gfx.Snippets.KeyRunnable;
-import gfx.Debug;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import Game.GameEngine.TickScheduleHandle;
 import Resources.Gfx;
 
 /**
@@ -22,19 +20,20 @@ import Resources.Gfx;
  */
 public class GfxEngine {
     public Camera camera;
-    private ArrayList<GfxElement> elements;
+    private ArrayList<GfxObject> elements;
     private ArrayList<KeyRunnable> keyEvents;
     public JFrame frame;
     public GfxPanel panel;
     private Timer frameRefresh;
     public CurrentScreen screenConfig;
+    private int framei = 0;
 
     /**
      * Creates new GfxEngine with empty JFrame and JPanel
      */
     public GfxEngine(Camera camera, String frameTitle) {
         this.camera = camera;
-        elements = new ArrayList<GfxElement>();
+        elements = new ArrayList<GfxObject>();
         this.frame = new JFrame(frameTitle);
         this.panel = new GfxPanel();
         this.keyEvents = new ArrayList<KeyRunnable>();
@@ -57,6 +56,7 @@ public class GfxEngine {
             frameRefresh.scheduleAtFixedRate(new TimerTask() {
                 public void run() {
                     panel.repaint();
+                    // System.out.printf("Frame:%d Elapsed:%d", framei, System.currentTimeMillis());
                 }
             }, 0, 1000 / 30);
         });
@@ -73,9 +73,8 @@ public class GfxEngine {
             super.paintComponent(g);
             if (Debug.drawing) System.out.println("Repainting");
             if (Debug.drawing) System.out.println("There are " + Integer.valueOf(elements.size()).toString() + " objects to draw");
-            for (GfxElement element : elements) {
-                element.obj.draw(camera, g);
-                if (Debug.drawing) System.out.println("Drawing " + element.name);
+            for (GfxObject element : elements) {
+                element.draw(camera, g);
             }
         }
 
@@ -102,9 +101,9 @@ public class GfxEngine {
     }
 
 
-    public GfxObjectHandle add_gfx(GfxObject obj, String name) {
+    public GfxObjectHandle add_gfx(GfxObject obj) {
         int id = this.elements.size(); //Takes new id, empty old null's are just forgotten
-        this.elements.add(new GfxElement(name, id, obj));
+        this.elements.add(obj);
         if (Debug.drawing) System.out.println(elements.toString());
         return new GfxObjectHandle(id);
     }
@@ -156,16 +155,9 @@ public class GfxEngine {
         changeScreenSize(screenConfig.width, screenConfig.height);
     }
 
-    private class GfxElement {
-        public String name;
-        public int id;
-        public GfxObject obj;
-    
-        public GfxElement(String name, int id, GfxObject obj) {
-            this.id = id;
-            this.name = name;
-            this.obj = obj;
-        }
+    public void miniscreen() {
+        changeScreenSize(screenConfig.width / 2, screenConfig.height / 2);
+        //To do
     }
 
     public class GfxObjectHandle {

@@ -13,15 +13,14 @@ public abstract class CircleSkull extends GfxShape {
         return "Circle";
     }
     @Override
-    public boolean isIntersecting(GfxShape otherShape) {
-        if (otherShape.type() == "Circle") {
-            return xMath.hypot(this.relX - otherShape.relX, this.relY - otherShape.relY) < this.data[0] + otherShape.data[0];
+    public boolean isIntersecting(GfxShape other, boolean dontRecurse) {
+        if (other.type() == "Circle") {
+            return xMath.hypot(this.relX - other.relX, this.relY - other.relY) < this.data[0] + other.data[0];
         }
-        else if (otherShape.type() == "Rectangle") {
-            return otherShape.isIntersecting(this);
-        }
-        else {
-            return false;
+        else if (dontRecurse) {
+            throw new IllegalArgumentException("Circle.isIntersecting() unknown type");
+        } else {
+            return other.isIntersecting(this, true);
         }
     }
     @Override

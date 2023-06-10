@@ -1,6 +1,8 @@
 C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\Dev.java
 C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\Game\BallyTheBall.java
 C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\Game\GameEngine.java
+C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\Game\Scene.java
+C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\Game\SceneTree.java
 C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\gfx\Camera.java
 C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\gfx\CircleSkull.java
 C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\gfx\CurrentScreen.java
@@ -13,6 +15,8 @@ C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\gf
 C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\gfx\RGB.java
 C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\gfx\SolidCircle.java
 C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\gfx\SolidRectangle.java
+C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\gfx\SolidTriangle.java
+C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\gfx\TriangleSkull.java
 C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\gfx\Snippets\KeyRunnable.java
 C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\gfx\Snippets\xMath.java
 C:\Users\miles\OneDrive\Documents\_Java\unnamed-physics-game\physics-game\src\Physics\Collisions.java

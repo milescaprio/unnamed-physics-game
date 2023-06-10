@@ -15,7 +15,7 @@ import gfx.Camera.Point;
  * 
  * CircleSkull
  * RectangleSkull
- * Todo: TriangleSkull
+ * TriangleSkull
  * 
  * Implemented in this order, with each only relying on intersection implementations of the next,
  * because first has the most precedence.
@@ -26,7 +26,10 @@ public abstract class GfxShape {
     public double relY;
     public Double[] data;
 
-    public abstract boolean isIntersecting(GfxShape otherShape);
+    public boolean isIntersecting(GfxShape otherShape) {
+        return isIntersecting(otherShape, false);
+    }
+    public abstract boolean isIntersecting(GfxShape otherShape, boolean dontRecurse);
     public abstract boolean containsPoint(Point p);
     public abstract String type();
     public abstract void draw(Camera camera, Graphics g, double x, double y);

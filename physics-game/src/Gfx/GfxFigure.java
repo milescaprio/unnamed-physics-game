@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 
 public class GfxFigure implements GfxObject {
-    public ArrayList<GfxShape> shapes;
+    private ArrayList<GfxShape> shapes;
     public double x;
     public double y;
     public GfxFigure(double x, double y) {
@@ -12,7 +12,13 @@ public class GfxFigure implements GfxObject {
         this.x = x;
         this.y = y;
     }
-
+    public ShapeHandle addShape(GfxShape shape) {
+        shapes.add(shape);
+        return new ShapeHandle(shapes.size() - 1);
+    }
+    public void removeShape(ShapeHandle handle) {
+        shapes.set(handle.id(), null);
+    }
     public boolean isIntersecting(GfxFigure other) {
         for (GfxShape shape : this.shapes) {
             for (GfxShape otherShape : other.shapes) {
@@ -23,9 +29,20 @@ public class GfxFigure implements GfxObject {
         }
         return false;
     }
+    @Override
     public void draw(Camera camera, Graphics g) {
         for (GfxShape shape : shapes) {
             shape.draw(camera, g, x, y);
+        }
+    }
+
+    public static class ShapeHandle {
+        private int id;
+        public ShapeHandle(int id) {
+            this.id = id;
+        }
+        public int id() {
+            return id;
         }
     }
 }
@@ -35,7 +52,7 @@ public class GfxFigure implements GfxObject {
 
 
 
-
+ 
 
 
 

@@ -14,33 +14,43 @@ public abstract class RectangleSkull extends GfxShape {
         return "Rectangle";
     }
     @Override
-    public boolean isIntersecting(GfxShape other) {
+    public boolean isIntersecting(GfxShape other, boolean dontRecurse) {
         if (other.type() == "Circle") {
-            return (xMath.in(other.relX, relX-data[0], relX+data[0]) && //relY warelY
+            return xMath.in(other.relX, getXl(), getXr()) && //relY warelY
                 xMath.hypot(0, relY-other.relY) < other.data[0] + data[1]
-                ||
-                xMath.in(other.relY, relY-data[1], relY+data[1]) && //relX warelY
+                || xMath.in(other.relY, getYb(), getYt()) && //relX warelY
                 xMath.hypot(relX-other.relX, 0) < other.data[0] + data[0]
-                ||
-                xMath.hypot(
+                || xMath.hypot(
                     relX+data[0]*xMath.direction(relX,other.relX)-other.relX, // if other.relX is above relX, then relX+data[0] is the right side of the rectangle
                     relY+data[1]*xMath.direction(relY,other.relY)-other.relY  //right warelY, second thing is "direction of progress", the circle
-                    ) < other.data[0]
-                ); 
-                //todo: doc test
+                    ) < other.data[0]; 
         }
         else if (other.type() == "Rectangle") {
-            return (containsPoint(new Point(other.relX-data[0], other.relY-data[1])) ||
-                    containsPoint(new Point(other.relX-data[0], other.relY+data[1])) ||
-                    containsPoint(new Point(other.relX+data[0], other.relY-data[1])) ||
-                    containsPoint(new Point(other.relX+data[0], other.relY+data[1])));
+            return (other.containsPoint(new Point(getXl(), getYb())) ||
+                    other.containsPoint(new Point(getXl(), getYt())) ||
+                    other.containsPoint(new Point(getXr(), getYb())) ||
+                    other.containsPoint(new Point(getXr(), getYt())));
         }
-        else {
-            return false;
+        else if (dontRecurse) {
+            throw new IllegalArgumentException("RectangleSkull.isIntersecting() unknown type");
+        } else {
+            return other.isIntersecting(this, true);
         }
     }
     @Override
     public boolean containsPoint(Point p) {
-        return (p.x > relX-data[0] && p.x < relX+data[0] && p.y > relY-data[1] && p.y < relY+data[1]);
+        return (p.x > getXl() && p.x < getXr() && p.y > getYb() && p.y < getYt());
+    }
+    public double getXl() {
+        return relX-data[0];
+    }
+    public double getXr() {
+        return relX+data[0];
+    }
+    public double getYb() {
+        return relY-data[1];
+    }
+    public double getYt() {
+        return relY+data[1];
     }
 }
