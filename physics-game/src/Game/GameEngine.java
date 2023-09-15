@@ -14,6 +14,9 @@ import gfx.Snippets.KeyRunnable;
 /**
  * A class which holds a GfxEngine Graphics Engine and a Game Tick timer, for this project.
  * The game ticks a certain amount times per second, by default 10. Framerate should be handled asynchronously in the GfxEngine
+ * 
+ * Do not establish schedules in schedule functions, as this will cause a ConcurrentModificationException.
+ * TODO: Add locking system for schedules.
  */
 public class GameEngine {
     public GfxEngine gfxEngine;

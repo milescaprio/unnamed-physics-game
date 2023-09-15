@@ -31,3 +31,5 @@ public class Collisions {
     public static double stickyVelocity(double v1, double v2, double m1, double m2) {
         return (m1*v1 + m2*v2)/(m1+m2);
     }
+
+}

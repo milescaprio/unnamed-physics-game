@@ -1,11 +1,15 @@
 package gfx;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
+import java.util.List;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import gfx.Snippets.KeyRunnable;
 
 import javax.swing.JFrame;
@@ -20,8 +24,17 @@ import Resources.Gfx;
  */
 public class GfxEngine {
     public Camera camera;
-    private ArrayList<GfxObject> elements;
-    private ArrayList<KeyRunnable> keyEvents;
+
+    //Manually-handled lock for all key events. If a key event needs to be added during a keyevent, add it to the queue, 
+    //because otherwise a deadlock will be formed. 
+    //Use waitKeyEventLockTurn() to get the lock, and keyEventLockDone() to release it.
+    //Upon the lock being released, all events in the queue will be run.
+    private AtomicBoolean keyEventLock = new AtomicBoolean(false);
+    private AtomicBoolean isRecursivePEKQ = new AtomicBoolean(false);
+    private List<Runnable> PostKeyEventQueue;
+
+    private List<GfxObject> elements;
+    private List<KeyRunnable> keyEvents;
     public JFrame frame;
     public GfxPanel panel;
     private Timer frameRefresh;
@@ -33,10 +46,11 @@ public class GfxEngine {
      */
     public GfxEngine(Camera camera, String frameTitle) {
         this.camera = camera;
-        elements = new ArrayList<GfxObject>();
+        this.elements = Collections.synchronizedList(new ArrayList<GfxObject>());
         this.frame = new JFrame(frameTitle);
         this.panel = new GfxPanel();
-        this.keyEvents = new ArrayList<KeyRunnable>();
+        this.keyEvents = Collections.synchronizedList(new ArrayList<KeyRunnable>());
+        this.PostKeyEventQueue = Collections.synchronizedList(new ArrayList<Runnable>());
         this.frameRefresh = new Timer();
         this.screenConfig = new CurrentScreen();
     }
@@ -49,7 +63,7 @@ public class GfxEngine {
     public void init() {
         SwingUtilities.invokeLater(() -> {
             panel.setBackground(Gfx.bg);
-            frame.setSize(camera.width, camera.height);
+            frame.setSize(camera.getWidth(), camera.getHeight());
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.getContentPane().add(panel, BorderLayout.CENTER);
             frame.setVisible(true);
@@ -62,6 +76,63 @@ public class GfxEngine {
         });
     }    
 
+    /**
+     * When this function returns, you have the lock. Relock it when you are done.
+     */
+    private void waitKeyEventLockTurn() {
+        while (true) {
+            while (keyEventLock.get()); //Wait for turn
+            if (keyEventLock.getAndSet(true) == false) {//Make an attempt to get the lock 
+                break;
+            }
+        }
+    }
+
+    /**
+     * Returns true if the lock is held, false if not.
+     * Not to be used for locking, simulatenous locks could be accidentally falsely established.
+     */
+    public boolean viewKeyEventLock() {
+        return keyEventLock.get();
+    }
+
+    /**
+     * Your runnable should not add to the event queue...
+     */
+    public void addToPostKeyEventQueue(Runnable runnable) {
+        synchronized(PostKeyEventQueue) {
+            if (Debug.notify == true) {
+                System.out.println("GfxEngine: added to post key event queue");
+            }       
+            PostKeyEventQueue.add(runnable);
+        }
+    }
+
+    private void keyEventLockDone() {
+        keyEventLock.set(false);
+        if (Debug.notify) {
+            System.out.println("GfxEngine: key event lock done");
+        }
+        if (isRecursivePEKQ.getAndSet(true) == false) {
+            synchronized(PostKeyEventQueue) {
+                for (Runnable runnable : PostKeyEventQueue) {
+                    runnable.run();
+                }
+                if (Debug.notify) {
+                    System.out.println("GfxEngine: All runnables in queue run");
+                }
+                PostKeyEventQueue.clear();
+            }
+            isRecursivePEKQ.set(false);
+        }
+    }
+
+    public void debugGfxObjects() {
+        for (GfxObject element : elements) {
+            System.out.println(element.toString());
+        }
+    }
+
     public class GfxPanel extends JPanel implements KeyListener {
         public GfxPanel() {
             super();
@@ -70,33 +141,120 @@ public class GfxEngine {
             this.addKeyListener(this);
         }
         public void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            if (Debug.drawing) System.out.println("Repainting");
-            if (Debug.drawing) System.out.println("There are " + Integer.valueOf(elements.size()).toString() + " objects to draw");
-            for (GfxObject element : elements) {
-                element.draw(camera, g);
+            try {
+                super.paintComponent(g);
+                if (Debug.drawing) System.out.println("Repainting");
+                if (Debug.drawing) System.out.println("There are " + Integer.valueOf(elements.size()).toString() + " objects to draw");
+                for (GfxObject element : elements) {
+                    element.draw(camera, g);
+                }
+            } catch (Exception e) {
+                if (Debug.explosive) {
+                    System.out.println("Exception in paintComponent");
+                    if (Debug.oneError) {
+                        e.printStackTrace();
+                    }
+                    System.exit(0);
+                } else {
+                    throw e;
+                }
             }
         }
 
         @Override
-        public void keyTyped(KeyEvent e) {
-            for (KeyRunnable runnable : keyEvents) {
-                runnable.keyTyped(e);
+        public synchronized void keyTyped(KeyEvent e) {
+            waitKeyEventLockTurn();
+            try {
+                for (int i = 0; i < keyEvents.size(); i++) { //Uhm ykw it probablt works
+                    KeyRunnable runnable = keyEvents.get(i);
+                    if (runnable == null) {
+                        if (Debug.notify) {
+                            System.out.println("GfxEngine: null keyevent");
+                        }
+                    } else {
+                        if (Debug.notify) {
+                            System.out.println("GfxEngine: type event");
+                        }
+                        runnable.keyTyped(e);
+                    }
+                }
+
+            } catch (Exception ex) {
+                if (Debug.explosive) {
+                    System.out.println("Exception in await in keytyped");
+                    if (Debug.oneError) {
+                        ex.printStackTrace();
+                    }
+                    System.exit(0);
+                } else {
+                    throw ex;
+                }
             }
+            keyEventLockDone();
         }
 
         @Override
-        public void keyPressed(KeyEvent e) {
-            for (KeyRunnable runnable : keyEvents) {
-                runnable.keyPressed(e);
+        public synchronized void keyPressed(KeyEvent e) {
+            waitKeyEventLockTurn();
+            try { 
+                synchronized(keyEvents) {
+                    for (int i = 0; i < keyEvents.size(); i++) { //Uhm ykw it probablt works
+                        KeyRunnable runnable = keyEvents.get(i);
+                        if (runnable == null) {
+                            if (Debug.notify) {
+                                System.out.println("GfxEngine: null keyevent");
+                            }
+                        } else {
+                            if (Debug.notify) {
+                                System.out.println("GfxEngine: pressing");
+                            }
+                            runnable.keyPressed(e);
+                        }
+                    }
+                } 
+            } catch (Exception ex) {
+                if (Debug.explosive) {
+                    System.out.println("Exception in await in keypressed");
+                    if (Debug.oneError) {
+                        ex.printStackTrace();
+                    }
+                    System.exit(0);
+                } else {
+                    throw ex;
+                }
             }
+            keyEventLockDone();
         }
 
         @Override
-        public void keyReleased(KeyEvent e) {
-            for (KeyRunnable runnable : keyEvents) {
-                runnable.keyReleased(e);
+        public synchronized void keyReleased(KeyEvent e) {
+            waitKeyEventLockTurn();
+            try {
+                for (int i = 0; i < keyEvents.size(); i++) { //Uhm ykw it probablt works
+                    KeyRunnable runnable = keyEvents.get(i);
+                    if (runnable == null) {
+                        if (Debug.notify) {
+                            System.out.println("GfxEngine: null keyevent");
+                        }
+                    } else {
+                        if (Debug.notify) {
+                            System.out.println("GfxEngine: releasing");
+                        }
+                        runnable.keyReleased(e);
+                    }
+                }
+            } catch (Exception ex) {
+                if (Debug.explosive) {
+                    System.out.println("Exception in await in keyreleased");
+                    if (Debug.oneError) {
+                        ex.printStackTrace();
+                    }
+                    System.exit(0);
+                } else {
+                    throw ex;
+                }
             }
+            keyEventLockDone();
         }
     }
 
@@ -118,13 +276,18 @@ public class GfxEngine {
         });
     }
 
-    public KeyEventHandle addKeyEvent(KeyRunnable runnable) {
+    public synchronized KeyEventHandle addKeyEvent(KeyRunnable runnable) {
+        waitKeyEventLockTurn();
         this.keyEvents.add(runnable);
-        return new KeyEventHandle(this.keyEvents.size() - 1);
+        var ret = new KeyEventHandle(this.keyEvents.size() - 1);
+        keyEventLockDone();
+        return ret;
     }
 
-    public void removeKeyEvent(KeyEventHandle handle) {
+    public synchronized void removeKeyEvent(KeyEventHandle handle) {
+        waitKeyEventLockTurn();
         this.keyEvents.set(handle.id(), null);
+        keyEventLockDone();
     }
 
     public void changeRefreshRate(double hz) {
@@ -144,8 +307,7 @@ public class GfxEngine {
     }
 
     public void changeScreenSize(int width, int height) {
-        camera.width = width;
-        camera.height = height;
+        camera.setScreenDimensions(width, height);
         SwingUtilities.invokeLater(() -> {
             frame.setSize(width, height);
         });
@@ -178,5 +340,9 @@ public class GfxEngine {
         public int id() {
             return id;
         }
+    }
+
+    public void debugPostKeyEventQueue() {
+        System.out.println(PostKeyEventQueue.toString());
     }
 }

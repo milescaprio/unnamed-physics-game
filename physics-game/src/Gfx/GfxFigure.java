@@ -12,6 +12,23 @@ public class GfxFigure implements GfxObject {
         this.x = x;
         this.y = y;
     }
+
+    public GfxFigure(double x, double y, ArrayList<GfxShape> shapes) {
+        this.shapes = shapes;
+        this.x = x;
+        this.y = y;
+    }
+
+    public GfxFigure(double x, double y, GfxShape[] shapes) {
+        this.shapes = new ArrayList<GfxShape>();
+        for (GfxShape shape : shapes) {
+            this.shapes.add(shape);
+        }
+        this.x = x;
+        this.y = y;
+    }
+
+
     public ShapeHandle addShape(GfxShape shape) {
         shapes.add(shape);
         return new ShapeHandle(shapes.size() - 1);

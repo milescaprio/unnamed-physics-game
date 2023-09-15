@@ -1,0 +1,12 @@
+to do list
+
+multithread safe adding events DONE
+fix upside down bugs DONE
+refresh rate sync? NVM
+better circle nesting DONE
+fix wide bug?
+triangle graphics DONE mostly
+interface
+
+finish scenes
+animations

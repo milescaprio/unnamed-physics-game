@@ -31,4 +31,7 @@ public class xMath {
        //This is because being outside would break the absolute value
        return (A == A1 + A2 + A3);
     } 
+    public static int dimension(Double x) {
+        return x == null ? 0 : 1;
+    }
 }
